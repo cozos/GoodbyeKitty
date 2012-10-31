@@ -13,6 +13,7 @@ function fuzzle(){
 
 
 fuzzle.prototype.render = function(){
+	var terminal_velocity = 20;
 	var num = Math.round(Math.random());
 	var t;
 	if(num == 1){
@@ -22,10 +23,13 @@ fuzzle.prototype.render = function(){
 	t = new trail(-21);
 	} 
 	g_trail.push(t);
-	//if player is within the game boundary defined by floorHeight and ceilingHeight
 	
-		this.velocity += this.gravity;
-		this.caty += this.velocity;
+	
+	if (this.velocity <= terminal_velocity){
+	this.velocity += this.gravity;
+	}
+		
+	this.caty += this.velocity;
 	
 	//if player crashes into the floor
 	if ((this.caty + this.height) > 640)
@@ -47,7 +51,15 @@ fuzzle.prototype.render = function(){
 
    
 fuzzle.prototype.up = function(){
-	this.gravity = -1.5;
+	if(this.velocity > 15){
+	this.gravity = -15;
+	}
+	else if(this.velocity > 5){
+	this.gravity = -5;
+	}
+	else{
+	this.gravity = -2;
+	}
 }
 
 
