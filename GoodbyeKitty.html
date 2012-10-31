@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+
+<head>
+    <script type="text/javascript" src="http://cdn.craftycomponents.com/crafty-release.js"></script>
+  	<script type="text/javascript" src='js/Background.js'></script>
+  	<script type="text/javascript" src='js/Fuzzle.js'></script>
+  	<script type="text/javascript" src='js/Keyboard.js'></script>
+  	<script type="text/javascript" src='js/trail.js'></script>
+	<script type="text/javascript">
+	var g_canvas;
+	var g_background;
+	var g_context;
+	var g_frameInterval;
+	
+	var g_fuzzle;
+	var g_trail = [];
+	function main(){
+		
+		initCanvas();
+		//document.addEventListener('keyDown', KEY, true);
+		g_background = new Background("sky.png",5);
+		g_fuzzle = new fuzzle();
+		g_frameInterval = setInterval(repaint, 1000/24);
+	
+		
+	}
+	
+	function initCanvas(){
+      g_canvas = document.getElementById('theCanvas');
+      g_context = g_canvas.getContext('2d');
+	}
+	
+	function repaint(){
+		
+		this.onkeydown=function(){g_fuzzle.up()};
+		
+		g_background.render();
+		g_fuzzle.render();
+		for (var i=0; i<g_trail.length; i++){
+			if(g_trail[i].posx < 0){
+			g_trail.splice(i,1);
+			}
+			g_trail[i].render();
+			
+		}
+		
+	
+	}
+	
+	
+	
+	function stop(){
+		clearInterval(g_frameInterval);
+	}
+	</script>
+  
+</head>
+
+<body onload = "main()">
+	
+	
+	 <canvas align="left" id="theCanvas" width="800" height="640">empty</canvas>
+	 <div id="hidden" style="visibility:hidden; width:1px; height:1px; overflow:hidden">
+	
+	
+	
+	<img    id="sky"
+            src="Images/sky.png"
+            >
+            
+    <img    id="fuzzle"
+            src="Images/ship_center.png"
+            >
+    <img    id="trail"
+            src="Images/splode_1.png"
+            >
+	 </div>
+</body>
+</html>
