@@ -5,8 +5,8 @@ function trail(speed){
 	this.ImageFile = document.getElementById("trail");
 	this.width = this.ImageFile.width;
 	this.height = this.ImageFile.height;
-	this.posx = g_fuzzle.catx - 30;
-	this.posy = g_fuzzle.caty;
+	this.posx = g_fuzzle.catx -3 ;
+	this.posy = g_fuzzle.caty + 45;
 	this.velocity = speed;
 	
 }

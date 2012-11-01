@@ -1,11 +1,11 @@
 function fuzzle(){
 	this.lives = 9;
 	this.velocity = 0;
-	this.gravity = 1;
+	this.gravity = 2;
 	this.ImageFile = document.getElementById("fuzzle");
 	this.width = this.ImageFile.width;
 	this.height = this.ImageFile.height;
-	this.catx = 200;
+	this.catx = 180;
 	this.caty = 300; 
 	
 	
@@ -44,22 +44,17 @@ fuzzle.prototype.render = function(){
 		this.velocity = 5;
 		
 	}
-	this.gravity = 1;
+	this.gravity = 2;
 	g_context.drawImage(this.ImageFile, this.catx, this.caty);
 	
 }
 
    
 fuzzle.prototype.up = function(){
-	if(this.velocity > 15){
-	this.gravity = -15;
-	}
-	else if(this.velocity > 5){
-	this.gravity = -5;
-	}
-	else{
-	this.gravity = -2;
-	}
+    if (this.velocity > 0){
+    this.velocity = 0;
+    }
+    this.gravity = -4;
 }
 
 
