@@ -1,22 +1,26 @@
-
 // @open license with citation
 // @please feel free to reuse this code for any purpose, citing dougx.net
 // @see http://dougx.net/plunder/license.txt for MIT open license text
 
-function Background()
+/**
+ * Its the background. 
+ * @constructor
+ */
+function Background(element,velocity)
 {
-	
-   this.BackgroundImage = document.getElementById("sky");
-  
-   this.myX = 0;
-   this.myVelocity = 5;
-	
+   // Image attributes
+   this.BackgroundImage = document.getElementById(element);
    this.myWidth  = this.BackgroundImage.width;
    this.myHeight = this.BackgroundImage.height;
- 
    
+   // Background attributes
+   this.myX = 0;
+   this.myVelocity = velocity; 
 }
 
+/**
+ * Renders the background. No idea how it works. 
+ */
 Background.prototype.render = function()
 {
    var pullWidth = this.myWidth - this.myX;
@@ -24,8 +28,6 @@ Background.prototype.render = function()
    {
       pullWidth = g_canvas.width;
    }
-
-   //dbg( this.myX + " , " + pullWidth, false);
 
    g_context.drawImage(this.BackgroundImage,
                        this.myX, 0,

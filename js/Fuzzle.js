@@ -1,61 +1,78 @@
+/**
+ * Its Fuzzle.
+ * @constructor
+ */
 function fuzzle(){
-	this.lives = 9;
-	this.velocity = 0;
-	this.gravity = 2;
+	//Image attributes
 	this.ImageFile = document.getElementById("fuzzle");
 	this.width = this.ImageFile.width;
 	this.height = this.ImageFile.height;
-	this.catx = 180;
-	this.caty = 300; 
 	
-	
+	//Fuzzle attributes
+	this.lives = 9;
+	this.velocity = 0;
+	this.gravity = 2;
+	this.posx = 180;
+	this.posy = 300; 
 }
 
-
+/**
+ * Renders Fuzzle.
+ */
 fuzzle.prototype.render = function(){
-	var terminal_velocity = 20;
-	var num = Math.round(Math.random());
+	
+	// Instantiates fuzzle's trail
 	var t;
-	if(num == 1){
-	t = new trail(-22);
-	}
-	else{
-	t = new trail(-21);
-	} 
+	if(Math.round(Math.random()) == 1) 	t = new trail(-22);
+	else 	t = new trail(-21);
 	g_trail.push(t);
 	
-	
-	if (this.velocity <= terminal_velocity){
+	// Updates Fuzzle's velocity and position.
 	this.velocity += this.gravity;
-	}
-		
-	this.caty += this.velocity;
+	this.posy += this.velocity;
 	
-	//if player crashes into the floor
-	if ((this.caty + this.height) > 640)
+	// If player crashes into the floor
+	if ((this.posy + this.height) > 640)
 	{
-		this.caty = (640 - this.height - 1.5);
+		this.posy = (640 - this.height - 1.5);
 		this.velocity = 0;		
 	}
-	//if player crashes into the ceiling
-	if (this.caty < 0)
+	
+	// If player crashes into the ceiling
+	if (this.posy < 0)
 	{
-		this.caty = 0 + 1.5;
+		this.posy = 0 + 1.5;
 		this.velocity = 5;
 		
 	}
+	// Sets gravity to default
 	this.gravity = 2;
-	g_context.drawImage(this.ImageFile, this.catx, this.caty);
+	
+	// Draws the image
+	g_context.drawImage(this.ImageFile, this.posx, this.posy);
 	
 }
 
-   
+/**
+ * Makes Fuzzle go up.
+ */  
 fuzzle.prototype.up = function(){
+    // Going up is a pain in the ass without this
     if (this.velocity > 0){
     this.velocity = 0;
     }
+    
+    // Accelerates upwards
     this.gravity = -4;
 }
 
+/**
+ * What happens when fuzzle collides into something.
+ */
+fuzzle.prototype.collided = function(){
+	// TODO.
+	//stop();
+	alert("You suck");
+}
 
 

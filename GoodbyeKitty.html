@@ -6,52 +6,155 @@
   	<script type="text/javascript" src='js/Background.js'></script>
   	<script type="text/javascript" src='js/Fuzzle.js'></script>
   	<script type="text/javascript" src='js/Keyboard.js'></script>
-  	<script type="text/javascript" src='js/trail.js'></script>
+  	<script type="text/javascript" src='js/Trail.js'></script>
+  	<script type="text/javascript" src='js/Obstacle.js'></script>
 	<script type="text/javascript">
+	
+	//Shit I don't understand
 	var g_canvas;
 	var g_background;
 	var g_context;
-	var g_frameInterval;
-	
+
+	//Fuzzle
 	var g_fuzzle;
-	var g_trail = [];
-	function main(){
-		
-		initCanvas();
-		//document.addEventListener('keyDown', KEY, true);
-		g_background = new Background("sky.png",5);
-		g_fuzzle = new fuzzle();
-		g_frameInterval = setInterval(repaint, 1000/24);
 	
-		
+	//Intervals
+	var g_frameInterval;
+	var g_createObstacleInterval;
+	var gametimer;
+	
+	//Object arrays
+	var g_trail = [];
+	var g_obstacle = [];
+	
+	/**
+ 	* It's the main.
+ 	*/
+	function main(){
+		//Initializes canvas, background, fuzzle, game interval and obstacle creation interval
+		initCanvas();
+		g_background = new Background("sky",5);
+		g_fuzzle = new fuzzle();
+		gametimer = 0;
+		g_frameInterval = setInterval(Repaint, 1000/24);
+		g_createObstacleInterval = setInterval(createObstacle, 1000/1000);
 	}
 	
+	/**
+ 	* Initializes the canvas.
+ 	*/
 	function initCanvas(){
       g_canvas = document.getElementById('theCanvas');
       g_context = g_canvas.getContext('2d');
 	}
 	
-	function repaint(){
+	/**
+ 	* Renders EVERYTHING. Called by g_frameInterval.
+ 	*/
+	function Repaint(){
 		
+		// Makes fuzzle jump up whenever a key is pressed
 		this.onkeydown=function(){g_fuzzle.up()};
 		
+		// Renders background and Fuzzle
 		g_background.render();
 		g_fuzzle.render();
-		for (var i=0; i<g_trail.length; i++){
-			if(g_trail[i].posx < 0){
-			g_trail.splice(i,1);
-			}
-			g_trail[i].render();
-			
-		}
+		renderArray(g_trail);
+		renderArray(g_obstacle);
 		
-	
+		// Check for collisions
+		collision_singleVSarray(g_fuzzle,g_obstacle);
 	}
 	
+	/*
+	 * Checks if a singular object collides with an array of objects 
+	 */
+	function collision_singleVSarray(single, array){
+		for(var i = 0; i < array.length; i++){
+			checkCollision(single,array[i]);
+		}
+	}
 	
+	/*
+	 * Checks if an array of objects with another array of objects 
+	 */
+	function collision_arrayVSarray(array, array){
+		// TODO
+	}
 	
+	/**
+ 	* Checks for collision between two objects.
+ 	*/
+ 	
+ 	function checkCollision(object1, object2){
+ 		// Defines hitbox parameters
+ 		var lower_x_1 = object1.posx;
+ 		var upper_x_1 = object1.posx + object1.width;
+ 	
+ 		var lower_y_1 = object1.posy;
+ 		var upper_y_1 = object1.posy + object1.height;
+ 		
+ 		var lower_x_2 = object2.posx;
+ 		var upper_x_2 = object2.posx + object2.width;
+ 		
+ 		var lower_y_2 = object2.posy;
+ 		var upper_y_2 = object2.posy + object2.height;
+ 		
+ 		// If the objects intersect, call collide.
+ 		if ( (((lower_x_1 > lower_x_2) && (lower_x_1 < upper_x_2)) || ((upper_x_1 > lower_x_2) && (upper_x_1 < upper_x_2))) &&
+ 			 (((lower_y_1 > lower_y_2) && (lower_y_1 < upper_y_2)) || ((upper_y_1 > lower_y_2) && (upper_y_1 < upper_y_2)))){
+ 			object1.collided();
+ 			object2.collided();
+ 		}
+ 	}
+	
+	/**
+ 	* Iterates through the object array and renders each one.
+ 	*/
+	function renderArray(array){
+		for (var j=0; j<array.length; j++){
+			// If the object past the left of the screen, it is deleted.
+			if(array[j].posx < 0){
+			array[j].destroy;
+			array.splice(j,1);
+			}
+			
+			// Renders the object
+			array[j].render();
+		}
+	}
+	
+	/**
+ 	* Creates an obstacle. Called by g_createObstacleInterval.
+ 	*/
+	function createObstacle() 
+	{
+	var d;
+	
+	/**
+ 	* Determines randomly (if 0 then devil, if 1,2 then pillar) which obstacle to instantiate.
+ 	*/
+	if (Math.round(Math.random()*1.5) == 0) d = new obstacle("devil",-6.5);
+	else d = new obstacle("pillar",-5);
+	
+	// Instantiates new Obstacle
+	g_obstacle.push(d);
+	
+	// Resets the interval for the next obstacle creation. This is so that obstacles appear randomly
+    clearInterval(g_createObstacleInterval); 
+    var x = Math.round(Math.random() * 1000) + 2500 - (gametimer * 50); 
+    g_createObstacleInterval = setInterval(createObstacle, x);
+    if (gametimer < 68) gametimer++;
+	}  
+	
+	/**
+	* Stops the game
+	*/
 	function stop(){
 		clearInterval(g_frameInterval);
+		clearInterval(g_createObstacleInterval);
+		g_background = new Background("gameover",0);
+		g_background.render();
 	}
 	</script>
   
@@ -59,21 +162,29 @@
 
 <body onload = "main()">
 	
-	
 	 <canvas align="left" id="theCanvas" width="800" height="640">empty</canvas>
 	 <div id="hidden" style="visibility:hidden; width:1px; height:1px; overflow:hidden">
 	
 	
 	
     <img    id="sky"
-            src="Images/sky.png"
-            >
+            src="Images/sky.png">
+            
     <img    id="fuzzle"
-            src="Images/fuzzle.png"
-            >
+            src="Images/fuzzle.png">
+            
     <img    id="trail"
-            src="Images/splode_1.png"
-            >
+            src="Images/splode_1.png">
+            
+    <img    id="devil"
+            src="Images/devil.png">
+            
+    <img    id="pillar"
+            src="Images/pillar.png">
+            
+    <img    id="gameover"
+            src="Images/gameover.png">
+            
 	 </div>
 </body>
 </html>
