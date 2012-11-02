@@ -11,7 +11,7 @@ function fuzzle(){
 	//Fuzzle attributes
 	this.lives = 9;
 	this.velocity = 0;
-	this.gravity = 2;
+	this.gravity = 1;
 	this.posx = 180;
 	this.posy = 300; 
 }
@@ -34,36 +34,20 @@ fuzzle.prototype.render = function(){
 	// If player crashes into the floor
 	if ((this.posy + this.height) > 640)
 	{
-		this.posy = (640 - this.height - 1.5);
+		this.posy = (640 - this.height - 0.5);
 		this.velocity = 0;		
 	}
 	
 	// If player crashes into the ceiling
 	if (this.posy < 0)
 	{
-		this.posy = 0 + 1.5;
-		this.velocity = 5;
+		this.posy = 0 + 0.5;
+		this.velocity = 0;
 		
 	}
-	// Sets gravity to default
-	this.gravity = 2;
 	
 	// Draws the image
-	g_context.drawImage(this.ImageFile, this.posx, this.posy);
-	
-}
-
-/**
- * Makes Fuzzle go up.
- */  
-fuzzle.prototype.up = function(){
-    // Going up is a pain in the ass without this
-    if (this.velocity > 0){
-    this.velocity = 0;
-    }
-    
-    // Accelerates upwards
-    this.gravity = -4;
+	g_context.drawImage(this.ImageFile, this.posx, this.posy);	
 }
 
 /**
