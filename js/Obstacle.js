@@ -71,10 +71,11 @@ obstacle.prototype.render = function(){
 }
 
 /**
- * What happens when an obstacle collides into something.
+ * What happens when an obstacle collides into something. For now, the obstacle dissapears.
  */
 obstacle.prototype.collided = function(){
-	// TODO.
+	// TODO
+	this.posx = -50;
 }
 
 

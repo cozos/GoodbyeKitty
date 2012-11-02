@@ -71,8 +71,7 @@ fuzzle.prototype.up = function(){
  */
 fuzzle.prototype.collided = function(){
 	// TODO.
-	//stop();
-	alert("You suck");
+	alert("You died. But its okay. For now.");
 }
 
 

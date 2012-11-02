@@ -71,7 +71,7 @@
 	 */
 	function collision_singleVSarray(single, array){
 		for(var i = 0; i < array.length; i++){
-			checkCollision(single,array[i]);
+			checkCollision(single,array[i],1);
 		}
 	}
 	
@@ -86,11 +86,11 @@
  	* Checks for collision between two objects.
  	*/
  	
- 	function checkCollision(object1, object2){
+ 	function checkCollision(object1, object2,fuzzle){
  		// Defines hitbox parameters
  		var lower_x_1 = object1.posx;
  		var upper_x_1 = object1.posx + object1.width;
- 	
+ 		
  		var lower_y_1 = object1.posy;
  		var upper_y_1 = object1.posy + object1.height;
  		
@@ -99,6 +99,13 @@
  		
  		var lower_y_2 = object2.posy;
  		var upper_y_2 = object2.posy + object2.height;
+ 		
+ 		if (fuzzle == 1){
+ 			lower_x_1 += 10;
+ 			upper_x_1 += -60;
+ 			lower_y_1 += 10;
+ 			upper_y_1 += -30;
+ 		}
  		
  		// If the objects intersect, call collide.
  		if ( (((lower_x_1 > lower_x_2) && (lower_x_1 < upper_x_2)) || ((upper_x_1 > lower_x_2) && (upper_x_1 < upper_x_2))) &&
@@ -115,7 +122,6 @@
 		for (var j=0; j<array.length; j++){
 			// If the object past the left of the screen, it is deleted.
 			if(array[j].posx < 0){
-			array[j].destroy;
 			array.splice(j,1);
 			}
 			
