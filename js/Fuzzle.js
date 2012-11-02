@@ -46,6 +46,8 @@ fuzzle.prototype.render = function(){
 		
 	}
 	
+	if (this.gravity < 2) this.gravity += 2;
+	
 	// Draws the image
 	g_context.drawImage(this.ImageFile, this.posx, this.posy);	
 }
@@ -56,6 +58,43 @@ fuzzle.prototype.render = function(){
 fuzzle.prototype.collided = function(){
 	// TODO.
 	alert("You died. But its okay. For now.");
+    g_keys = [];
 }
 
+/**
+* Makes Fuzzle go up.
+*/  
+fuzzle.prototype.up = function(){
+	
+    // Going up is a pain in the ass without this
+    if (this.velocity > 0){
+    this.velocity = 0;
+    }
+    
+    //Accelerates upwards
+    this.gravity = -2;    
+}
+
+// #CODE MOVED FROM Keyboard.js - it's redundant with Render() though.
+/* 
+//if player is within the game boundary defined by floorHeight and ceilingHeight
+if ((g_fuzzle.posy + g_fuzzle.height) < 640 && g_fuzzle.posy > 10)
+{
+	g_fuzzle.velocity = -10;
+	g_fuzzle.posy += g_fuzzle.velocity;
+}
+//if player crashes into the floor
+if ((g_fuzzle.posy + g_fuzzle.height) > 640)
+{
+	g_fuzzle.posy = (640 - g_fuzzle.height - 0.5);
+	g_fuzzle.velocity = -10;
+	g_fuzzle.posy += g_fuzzle.velocity;
+}
+//if player crashes into the ceiling
+if (g_fuzzle.posy < 0)
+{
+	g_fuzzle.posy = 0 + 0.1;
+	g_fuzzle.velocity = 0;
+}
+*/
 
