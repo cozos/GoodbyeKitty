@@ -26,18 +26,23 @@
 	//Object arrays
 	var g_trail = [];
 	var g_obstacle = [];
+
+	//Keys arrays
+	var g_keys = [];
 	
 	/**
  	* It's the main.
  	*/
 	function main(){
-		//Initializes canvas, background, fuzzle, game interval and obstacle creation interval
+		//Initializes canvas, background, fuzzle, game interval and obstacle creation interval, **newly added: keydown and keyup
 		initCanvas();
 		g_background = new Background("sky",5);
 		g_fuzzle = new fuzzle();
 		gametimer = 0;
 		g_frameInterval = setInterval(Repaint, 1000/24);
 		g_createObstacleInterval = setInterval(createObstacle, 1000/1000);
+		document.addEventListener('keydown', keyDown, false);
+		document.addEventListener('keyup', keyUp, false);
 	}
 	
 	/**
@@ -65,6 +70,22 @@
 		// Check for collisions
 		collision_singleVSarray(g_fuzzle,g_obstacle);
 	}
+
+	/*
+	 * Stores keys pressed into an object array(g_keys[]) and remove them from the array when the keys are released
+	 */
+	function keyDown(e)
+	{
+		g_keys[e.keyCode] = true;
+		//e.preventDefault();
+	}
+	
+	function keyUp(e)
+	{
+		delete g_keys[e.keyCode];
+		//e.preventDefault();
+	}
+
 	
 	/*
 	 * Checks if a singular object collides with an array of objects 
