@@ -121,11 +121,12 @@
  		var lower_y_2 = object2.posy;
  		var upper_y_2 = object2.posy + object2.height;
  		
+ 		// Adjusts hitbox for fuzzle
  		if (fuzzle == 1){
- 			lower_x_1 += 10;
+ 			lower_x_1 += 60;
  			upper_x_1 += -60;
- 			lower_y_1 += 10;
- 			upper_y_1 += -30;
+ 			lower_y_1 += 50;
+ 			upper_y_1 += -40;
  		}
  		
  		// If the objects intersect, call collide.
