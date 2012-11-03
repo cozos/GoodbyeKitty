@@ -146,7 +146,7 @@
 	function renderArray(array){
 		for (var j=0; j<array.length; j++){
 			// If the object past the left of the screen, it is deleted.
-			if(array[j].posx < 0){
+			if(array[j].posx < -50){
 			array.splice(j,1);
 			}
 			
@@ -165,8 +165,8 @@
 	/**
  	* Determines randomly (if 0 then devil, if 1,2 then pillar) which obstacle to instantiate.
  	*/
-	if (Math.round(Math.random()*1.5) == 0) d = new obstacle("devil",-6.5);
-	else d = new obstacle("pillar",-5);
+	if (Math.round(Math.random()*1.5) == 0) d = new obstacle("devil",-13);
+	else d = new obstacle("pillar",-10);
 	
 	// Instantiates new Obstacle
 	g_obstacle.push(d);
