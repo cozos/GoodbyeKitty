@@ -30,6 +30,11 @@
 
 	//Keys arrays
 	var g_keys = [];
+
+	//Background Level Manager (level increases when timer is a multiple of transition, function will be called in Repaint)
+	var transition = 200;
+	var timer = 0;
+	var level = 0;
 	
 	/**
  	* It's the main.
@@ -72,6 +77,10 @@
 		
 		// Check for collisions
 		collision_singleVSarray(g_fuzzle,g_obstacle);
+
+		// Level Manager
+		timer++;
+		level = (timer - (timer % transition)) / transition;
 	}
 
 	/*
