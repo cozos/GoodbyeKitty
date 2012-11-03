@@ -12,6 +12,7 @@
 	
 	//Shit I don't understand
 	var g_canvas;
+	var g_foreground;
 	var g_background;
 	var g_context;
 
@@ -34,12 +35,13 @@
  	* It's the main.
  	*/
 	function main(){
-		//Initializes canvas, background, fuzzle, game interval and obstacle creation interval, **newly added: keydown and keyup
+		//Initializes canvas, background, fuzzle, game interval, key controls and obstacle creation interval
 		initCanvas();
 		g_background = new Background("sky",5);
 		g_fuzzle = new fuzzle();
 		gametimer = 0;
 		g_frameInterval = setInterval(Repaint, 1000/24);
+		g_foreground = new Background("cloud",8);
 		g_createObstacleInterval = setInterval(createObstacle, 1000/1000);
 		document.addEventListener('keydown', keyDown, false);
 		document.addEventListener('keyup', keyUp, false);
@@ -63,6 +65,7 @@
 		
 		// Renders background and Fuzzle
 		g_background.render();
+		g_foreground.render();
 		g_fuzzle.render();
 		renderArray(g_trail);
 		renderArray(g_obstacle);
@@ -183,6 +186,7 @@
 		clearInterval(g_createObstacleInterval);
 		g_background = new Background("gameover",0);
 		g_background.render();
+		g_foreground.render();
 	}
 	</script>
   
@@ -193,7 +197,8 @@
 	 <canvas align="left" id="theCanvas" width="800" height="640">empty</canvas>
 	 <div id="hidden" style="visibility:hidden; width:1px; height:1px; overflow:hidden">
 	
-	
+    <img    id="cloud"
+            src="Images/cloud overlay.png">	
 	
     <img    id="sky"
             src="Images/sky.png">
