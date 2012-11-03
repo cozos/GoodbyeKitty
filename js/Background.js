@@ -23,6 +23,9 @@ function Background(element,velocity)
  */
 Background.prototype.render = function()
 {
+   //the new scrollRate is 1.25 to the power of the level
+   var scrollRate = Math.pow(1.25,level)
+
    var pullWidth = this.myWidth - this.myX;
    if ( pullWidth > g_canvas.width)
    {
@@ -45,7 +48,7 @@ Background.prototype.render = function()
                             secondPullWidth, this.myHeight);
    }
 
-   this.myX += this.myVelocity;
+   this.myX += (this.myVelocity * scrollRate);
 
    if (this.myX >= this.myWidth)
    {
