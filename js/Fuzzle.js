@@ -14,6 +14,7 @@ function fuzzle(){
 	this.gravity = 1;
 	this.posx = 0.15 * g_canvas.width;
 	this.posy = 0.5 * g_canvas.height;
+    this.flag = 0;
 }
 
 /**
@@ -22,6 +23,7 @@ function fuzzle(){
 fuzzle.prototype.render = function(){
     
     // Instantiates fuzzle's trail
+    if (this.flag == 0){
 	var t;
 	if(Math.round(Math.random()) == 1){
      	t = new trail("trail",-22);
@@ -30,7 +32,10 @@ fuzzle.prototype.render = function(){
      	t = new trail("trail",-20);
     }
     g_trail.push(t);
+    }
 	
+    this.flag = 0;
+    
 	// Updates Fuzzle's velocity and position.
 	this.velocity += this.gravity;
 	this.posy += this.velocity;
@@ -70,6 +75,7 @@ fuzzle.prototype.collided = function(){
 * Makes Fuzzle go up.
 */  
 fuzzle.prototype.up = function(){
+    this.flag = 1;
     var t;
 	if(Math.round(Math.random()) == 1){
      	t = new trail("firetrail",-22);
