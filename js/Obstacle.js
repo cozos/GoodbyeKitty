@@ -24,7 +24,10 @@ function obstacle(element,velocity){
 /**
  * Renders obstacles.
  */
-obstacle.prototype.render = function(){	
+obstacle.prototype.render = function(){
+
+	//Speed of obstacles will increase when the level increases
+	var scrollRate = Math.pow(1.25,level)
 	
 	// IF OBSTACLE IS OF TYPE DEVIL
 	if (this.type == "devil"){
@@ -64,7 +67,7 @@ obstacle.prototype.render = function(){
 	}
 	
 	// Update x coordinate of obstacle
-    this.posx += this.xvelocity;
+    this.posx += (this.xvelocity * scrollRate);
   	
   	// Render the image
   	g_context.drawImage(this.ImageFile, this.posx, this.posy);
@@ -75,7 +78,7 @@ obstacle.prototype.render = function(){
  */
 obstacle.prototype.collided = function(){
 	// TODO
-	this.posx = -50;
+	this.posx = -100;
 }
 
 
