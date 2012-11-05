@@ -11,7 +11,7 @@ function obstacle(element,velocity){
 	// Obstacle attributes
 	this.type = element;
 	this.xvelocity = velocity;
-	this.posx = 800;
+	this.posx = 960;
 	this.posy = Math.round((Math.random()*640));
 	if (this.posy + this.height > 640)	 this.posy = (640 - this.height - 1.5);
 	
