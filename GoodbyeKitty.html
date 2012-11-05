@@ -141,6 +141,12 @@
 	
 	/**
  	* Checks for collision between two objects.
+    * @param Fuzzle|Obstacle|Trail $object1
+    *       The first object to be checked for collision.
+    * @param Fuzzle|Obstacle|Trail $object2
+    *       The second object to be checked for collision.
+    * @param int $fuzzle
+    *       Set as 1 if you are checking if Fuzzle collides into something. This is because Fuzzle's hitbox is kind of fucked up, so it has to be adjusted a little.
  	*/
  	
  	function checkCollision(object1, object2,fuzzle){

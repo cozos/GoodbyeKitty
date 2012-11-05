@@ -1,6 +1,10 @@
 /**
  * Its an obstacle.
  * @constructor
+ * @param string $element 
+ *      The name of the img element that will be fetched.
+ * @param int $velocity
+ *      The speed that the obstacle scrolls left at (negative number)
  */
 function obstacle(element,velocity){
 	// Image attributes
