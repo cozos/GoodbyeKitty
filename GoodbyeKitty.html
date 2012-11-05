@@ -30,6 +30,7 @@
 
 	//Keys arrays
 	var g_keys = [];
+	var mouseDown = false;
 
 	//Background Level Manager (level increases when timer is a multiple of transition, function will be called in Repaint)
 	var transition = 200;
@@ -50,6 +51,8 @@
 		g_createObstacleInterval = setInterval(createObstacle, 1000/1000);
 		document.addEventListener('keydown', keyDown, false);
 		document.addEventListener('keyup', keyUp, false);
+		document.addEventListener('mousedown', mouseDown, false);
+		document.addEventListener('mouseup', mouseUp, false);
 	}
 	
 	/**
@@ -67,6 +70,7 @@
 		
 		// Makes fuzzle jump up whenever a key is pressed
 		keyboard();
+		mouse();
 		
 		// Renders background and Fuzzle
 		g_background.render();
@@ -101,6 +105,23 @@
 		//e.preventDefault();
 	}
 
+	function mouseDown()
+	{
+		g_mouse = true;
+	}
+	
+	function mouseUp()
+	{
+		g_mouse = false;
+	}
+
+	function mouse()
+	{
+		if (g_mouseDown == true) //check if mouse is pressed
+		{
+			g_fuzzle.up();	
+		}
+	}
 	
 	/*
 	 * Checks if a singular object collides with an array of objects 
