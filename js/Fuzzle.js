@@ -12,8 +12,8 @@ function fuzzle(){
 	this.lives = 9;
 	this.velocity = 0;
 	this.gravity = 1;
-	this.posx = 180;
-	this.posy = 300; 
+	this.posx = 0.15 * g_canvas.width;
+	this.posy = 0.5 * g_canvas.height;
 }
 
 /**
@@ -32,9 +32,9 @@ fuzzle.prototype.render = function(){
 	this.posy += this.velocity;
 	
 	// If player crashes into the floor
-	if ((this.posy + this.height) > 640)
+	if ((this.posy + this.height) > g_canvas.height)
 	{
-		this.posy = (640 - this.height - 0.5);
+		this.posy = (g_canvas.height - this.height - 0.5);
 		this.velocity = 0;		
 	}
 	
