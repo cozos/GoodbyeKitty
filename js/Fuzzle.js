@@ -20,12 +20,16 @@ function fuzzle(){
  * Renders Fuzzle.
  */
 fuzzle.prototype.render = function(){
-	
-	// Instantiates fuzzle's trail
+    
+    // Instantiates fuzzle's trail
 	var t;
-	if(Math.round(Math.random()) == 1) 	t = new trail(-22);
-	else 	t = new trail(-21);
-	g_trail.push(t);
+	if(Math.round(Math.random()) == 1){
+     	t = new trail("trail",-22);
+	}
+    else{
+     	t = new trail("trail",-20);
+    }
+    g_trail.push(t);
 	
 	// Updates Fuzzle's velocity and position.
 	this.velocity += this.gravity;
@@ -59,20 +63,31 @@ fuzzle.prototype.collided = function(){
 	// TODO.
 	alert("You died. But its okay. For now.");
     g_keys = [];
+    g_mousedown = false;
 }
 
 /**
 * Makes Fuzzle go up.
 */  
 fuzzle.prototype.up = function(){
-	
+    var t;
+	if(Math.round(Math.random()) == 1){
+     	t = new trail("firetrail",-22);
+	}
+    else{
+     	t = new trail("firetrail",-22);
+    }
+    g_trail.push(t);
+    
     // Going up is a pain in the ass without this
     if (this.velocity > 0){
     this.velocity = 0;
     }
     
     //Accelerates upwards
-    this.gravity = -2;    
+    this.gravity = -2;  
+    
+    g_context.drawImage(this.ImageFile, this.posx, this.posy);	  
 }
 
 // #CODE MOVED FROM Keyboard.js - it's redundant with Render() though.
