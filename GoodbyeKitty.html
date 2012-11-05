@@ -80,7 +80,10 @@
 
 		// Level Manager
 		timer++;
-		level = (timer - (timer % transition)) / transition;
+		if (level < 6)
+		{
+			level = (timer - (timer % transition)) / transition;
+		}
 	}
 
 	/*
@@ -174,17 +177,20 @@
 	/**
  	* Determines randomly (if 0 then devil, if 1,2 then pillar) which obstacle to instantiate.
  	*/
-	if (Math.round(Math.random()*1.5) == 0) d = new obstacle("devil",-13);
-	else d = new obstacle("pillar",-10);
+	if (Math.round(Math.random()*1.5) == 0) d = new obstacle("devil",-7);
+	else d = new obstacle("pillar",-5);
 	
 	// Instantiates new Obstacle
 	g_obstacle.push(d);
 	
 	// Resets the interval for the next obstacle creation. This is so that obstacles appear randomly
-    clearInterval(g_createObstacleInterval); 
-    var x = Math.round(Math.random() * 1000) + 2500 - (gametimer * 50); 
-    g_createObstacleInterval = setInterval(createObstacle, x);
-    if (gametimer < 68) gametimer++;
+	clearInterval(g_createObstacleInterval); 
+	var x = Math.round(Math.random() * 1000) + 2500 - (gametimer * 50); 
+	g_createObstacleInterval = setInterval(createObstacle, x);
+	if (gametimer < 100)
+		{
+			gametimer++;
+		}
 	}  
 	
 	/**
@@ -203,7 +209,7 @@
 
 <body onload = "main()">
 	
-	 <canvas align="left" id="theCanvas" width="800" height="640">empty</canvas>
+	 <canvas align="left" id="theCanvas" width="960" height="640">empty</canvas>
 	 <div id="hidden" style="visibility:hidden; width:1px; height:1px; overflow:hidden">
 	
     <img    id="cloud"
