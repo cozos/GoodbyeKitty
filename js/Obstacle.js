@@ -11,9 +11,9 @@ function obstacle(element,velocity){
 	// Obstacle attributes
 	this.type = element;
 	this.xvelocity = velocity;
-	this.posx = 960;
-	this.posy = Math.round((Math.random()*640));
-	if (this.posy + this.height > 640)	 this.posy = (640 - this.height - 1.5);
+	this.posx = g_canvas.width;
+	this.posy = Math.round((Math.random()*g_canvas.height));
+	if (this.posy + this.height > g_canvas.height)	 this.posy = (g_canvas.height - this.height - 1.5);
 	
 	// Devil attributes
 	this.gravity = Math.random()*0.5 - 0.25;
@@ -44,9 +44,9 @@ obstacle.prototype.render = function(){
 		this.counter--;
 	
 		// If devil crashes into the floor, reset direction
-		if ((this.posy + this.height) > 640)
+		if ((this.posy + this.height) > g_canvas.height)
 		{
-			this.posy = (640 - this.height - 1.5);
+			this.posy = (g_canvas.height - this.height - 1.5);
 			this.yvelocity = 0;		
 			this.counter = Math.round(Math.random()*5+10);
 			this.gravity = (Math.random()*-0.25);
