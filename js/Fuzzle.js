@@ -22,7 +22,7 @@ function fuzzle(){
  */
 fuzzle.prototype.render = function(){
     
-    // Instantiates fuzzle's trail
+    //Instantiates fuzzle's trail
     if (this.flag == 0){
 	var t;
 	if(Math.round(Math.random()) == 1){
@@ -32,7 +32,8 @@ fuzzle.prototype.render = function(){
      	t = new trail("trail",-20);
     }
     g_trail.push(t);
-    }
+    } 
+   
 	
     this.flag = 0;
     

@@ -6,7 +6,7 @@
   	<script type="text/javascript" src='js/Background.js'></script>
   	<script type="text/javascript" src='js/Fuzzle.js'></script>
   	<script type="text/javascript" src='js/Keyboard.js'></script>
-  	<script type="text/javascript" src='js/Trail.js'></script>
+  	<script type="text/javascript" src='js/trail.js'></script>
   	<script type="text/javascript" src='js/Obstacle.js'></script>
 	<script type="text/javascript">
 	
@@ -143,8 +143,10 @@
  	* Checks for collision between two objects.
     * @param Fuzzle|Obstacle|Trail $object1
     *       The first object to be checked for collision.
+    * 
     * @param Fuzzle|Obstacle|Trail $object2
     *       The second object to be checked for collision.
+    * 
     * @param int $fuzzle
     *       Set as 1 if you are checking if Fuzzle collides into something. This is because Fuzzle's hitbox is kind of fucked up, so it has to be adjusted a little.
  	*/
@@ -249,7 +251,7 @@
             src="Images/fuzzle.png">
             
     <img    id="trail"
-            src="Images/fart.png">
+            src="Images/Fart.png">
             
     <img    id="firetrail"
             src="Images/FieryFart.png">
@@ -264,7 +266,7 @@
             src="Images/gameover.png">
             
     <audio  id="nyan_cat" 
-            src="Audio/DRE.ogg"
+            src="Audio/Dr_DRE.ogg"
             autoplay="autoplay">
     </audio>
             

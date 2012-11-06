@@ -13,7 +13,6 @@ function trail(element,speed){
 	this.posy = g_fuzzle.posy + 45;
 	this.velocity = speed;
     this.counter = 0;
-
 }
 
 /**
