@@ -10,11 +10,12 @@ function Background(element,velocity)
 {
    // Image attributes
    this.BackgroundImage = document.getElementById(element);
-   this.myWidth  = this.BackgroundImage.width;
-   this.myHeight = this.BackgroundImage.height;
+   this.myWidth  = this.BackgroundImage.width * g_resize;
+   this.myHeight = this.BackgroundImage.height * g_resize;
    
    // Background attributes
-   this.myX = 0;
+   this.myX1 = 0;
+   this.myX2 = this.myWidth;
    this.myVelocity = velocity; 
 }
 
@@ -26,32 +27,21 @@ Background.prototype.render = function()
    //the new scrollRate is 1.25 to the power of the level
    var scrollRate = Math.pow(1.25,level)
 
-   var pullWidth = this.myWidth - this.myX;
-   if ( pullWidth > g_canvas.width)
-   {
-      pullWidth = g_canvas.width;
-   }
+   if (this.myX1 <= - this.myWidth)
+	{
+		this.myX1 = this.myWidth;
+	}
+	if (this.myX2 <= - this.myWidth)
+	{
+		this.myX2 = this.myWidth;
+	}
 
    g_context.drawImage(this.BackgroundImage,
-                       this.myX, 0,
-                       pullWidth, this.myHeight,
-                       0,g_canvas.height - this.myHeight,
-                       pullWidth, this.myHeight);
-
-   if ( pullWidth < g_canvas.width )
-   {
-        var secondPullWidth = g_canvas.width - pullWidth;
-        g_context.drawImage(this.BackgroundImage,
-                            0, 0,
-                            secondPullWidth, this.myHeight,
-                            pullWidth, g_canvas.height - this.myHeight,
-                            secondPullWidth, this.myHeight);
-   }
-
-   this.myX += (this.myVelocity * scrollRate);
-
-   if (this.myX >= this.myWidth)
-   {
-      this.myX = 0;
-   }
+                       this.myX1, this.myY,
+                       this.myWidth, this.myHeight);
+   g_context.drawImage(this.BackgroundImage,
+                       this.myX2, this.myY,
+                       this.myWidth, this.myHeight);
+   this.myX1 -= (this.myVelocity * scrollRate);
+   this.myX2 -= (this.myVelocity * scrollRate);
 }
