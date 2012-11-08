@@ -14,7 +14,7 @@ function Background(element,velocity)
    this.myHeight = this.BackgroundImage.height * g_resize;
    
    // Background attributes
-   this.myX1 = 0;
+   this.myX = 0;
    this.myX2 = this.myWidth;
    this.myVelocity = velocity; 
 }
