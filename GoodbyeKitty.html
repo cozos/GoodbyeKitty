@@ -9,7 +9,14 @@
   	<script type="text/javascript" src='js/trail.js'></script>
   	<script type="text/javascript" src='js/Obstacle.js'></script>
 	<script type="text/javascript">
-	
+
+	//Window variables
+	var windowWidth;
+	var windowHeight;
+	var tempWidthRatio;
+	var tempHeghtRatio;
+	var g_resize = 0.9;
+
 	//Shit I don't understand
 	var g_canvas;
 	var g_foreground;
@@ -59,8 +66,17 @@
  	* Initializes the canvas.
  	*/
 	function initCanvas(){
-      g_canvas = document.getElementById('theCanvas');
-      g_context = g_canvas.getContext('2d');
+	g_canvas = document.getElementById('theCanvas');
+	g_context = g_canvas.getContext('2d');
+	
+	//Gets the innerWidth and innerHeight of browser and stores the minimum ratio to g_resize, subsequently resizing g_canvas
+	windowWidth = window.innerWidth;
+	windowHeight = window.innerHeight;
+	tempWidthRatio = windowWidth / g_canvas.width;
+	tempHeightRatio = windowHeight / g_canvas.height;
+	g_resize = Math.min(tempWidthRatio,tempHeightRatio);
+	g_canvas.width *= g_resize;
+	g_canvas.height *= g_resize;
 	}
 	
 	/**
