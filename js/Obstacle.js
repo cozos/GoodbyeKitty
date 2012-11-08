@@ -74,7 +74,7 @@ obstacle.prototype.render = function(){
     this.posx += (this.xvelocity * scrollRate);
   	
   	// Render the image
-  	g_context.drawImage(this.ImageFile, this.posx, this.posy);
+  	g_context.drawImage(this.ImageFile, this.posx, this.posy, this.width, this.height);
 }
 
 /**
