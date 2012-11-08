@@ -5,8 +5,8 @@
 function trail(element,speed){
 	// Image Attributes
 	this.ImageFile = document.getElementById(element);
-	this.width = this.ImageFile.width;
-	this.height = this.ImageFile.height;
+	this.width = this.ImageFile.width * g_resize;
+	this.height = this.ImageFile.height * g_resize;
 	
 	// Trail attributues
 	this.posx = g_fuzzle.posx - 20;
