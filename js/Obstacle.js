@@ -9,8 +9,8 @@
 function obstacle(element,velocity){
 	// Image attributes
 	this.ImageFile = document.getElementById(element);
-	this.width = this.ImageFile.width;
-	this.height = this.ImageFile.height;
+	this.width = this.ImageFile.width * g_resize;
+	this.height = this.ImageFile.height * g_resize;
 	
 	// Obstacle attributes
 	this.type = element;
