@@ -59,7 +59,7 @@ fuzzle.prototype.render = function(){
 	if (this.gravity < 2) this.gravity += 2;
 	
 	// Draws the image
-	g_context.drawImage(this.ImageFile, this.posx, this.posy);	
+	g_context.drawImage(this.ImageFile, this.posx, this.posy, this.width, this.height);	
 }
 
 /**
@@ -94,6 +94,6 @@ fuzzle.prototype.up = function(){
     //Accelerates upwards
     this.gravity = -2;  
     
-    g_context.drawImage(this.ImageFile, this.posx, this.posy);	  
+    g_context.drawImage(this.ImageFile, this.posx, this.posy, this.width, this.height);	  
 }
 
