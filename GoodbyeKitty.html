@@ -6,8 +6,9 @@
   	<script type="text/javascript" src='js/Background.js'></script>
   	<script type="text/javascript" src='js/Fuzzle.js'></script>
   	<script type="text/javascript" src='js/Keyboard.js'></script>
-  	<script type="text/javascript" src='js/trail.js'></script>
+  	<script type="text/javascript" src='js/Trail.js'></script>
   	<script type="text/javascript" src='js/Obstacle.js'></script>
+	<script type="text/javascript" src='js/LevelDirector.js'></script>
 	<script type="text/javascript">
 
 	//Window variables
@@ -27,8 +28,12 @@
 	var g_fuzzle;
 	
 	//Intervals
-	var g_frameInterval;
+	var g_renderInterval;
+	var g_clockInterval;
+	var g_inputInterval;
 	var g_createObstacleInterval;
+	var g_powerupInterval;
+	var g_checkCollisionInterval;
 	var gametimer;
 	
 	//Object arrays
@@ -40,26 +45,26 @@
 	var g_mouseDown = false;
 
 	//Background Level Manager (level increases when timer is a multiple of transition, function will be called in Repaint)
-	var transition = 200;
-	var timer = 0;
-	var level = 0;
+	var g_levelDirector;
+	var g_gameState = "mainmenu";
+
+	//Audio manager
+	var g_audioLoop;
 	
 	/**
  	* It's the main.
  	*/
 	function main(){
-		//Initializes canvas, background, fuzzle, game interval, key controls and obstacle creation interval
+		//Initializes main screen, key controls. Game start event is handled by mousedown event
 		initCanvas();
-		g_background = new Background("sky",5);
-		g_fuzzle = new fuzzle();
-		gametimer = 0;
-		g_frameInterval = setInterval(Repaint, 1000/24);
-		g_foreground = new Background("cloud",8);
-		g_createObstacleInterval = setInterval(createObstacle, 1000/1000);
+		g_background = new Background("gamestart",0);
+		g_background.render();
 		document.addEventListener('keydown', keyDown, false);
 		document.addEventListener('keyup', keyUp, false);
 		document.addEventListener('mousedown', mouseDown, false);
 		document.addEventListener('mouseup', mouseUp, false);
+		g_audioLoop = document.getElementById("nyan_cat");
+		g_audioLoop.volume = 0;
 	}
 	
 	/**
@@ -79,31 +84,38 @@
 	g_canvas.height *= g_resize;
 	}
 	
-	/**
- 	* Renders EVERYTHING. Called by g_frameInterval.
- 	*/
-	function Repaint(){
-		
-		// Makes fuzzle jump up whenever a key is pressed
-		keyboard();
-		mouse();
-		
-		// Renders background and Fuzzle
-		g_background.render();
-		g_foreground.render();
-		g_fuzzle.render();
-		renderArray(g_trail);
-		renderArray(g_obstacle);
-		
-		// Check for collisions
-		collision_singleVSarray(g_fuzzle,g_obstacle);
+	function renderLoop()
+	{ 
+	//if ( g_paused )
+	//return;
 
-		// Level Manager
-		timer++;
-		if (level < 6)
-		{
-			level = (timer - (timer % transition)) / transition;
-		}
+	g_background.render();
+	g_foreground.render();
+	g_fuzzle.render();
+	renderArray(g_trail);
+	// introduce enemy
+	renderArray(g_obstacle);
+	renderHUD();
+	}
+
+	function inputLoop()
+	{
+		// Makes fuzzle jump up whenever a key is pressed
+		mouse();
+		keyboard();
+	}
+
+	function renderHUD()
+	{
+            g_context.fillStyle = "black";
+            g_context.fillText("Lives: " + g_fuzzle.lives,10,10);
+            g_context.fillText("Powerups: " + g_fuzzle.powerUp + "/9",10,20);
+            g_context.fillText("Time Elapsed: " + (g_levelDirector.myClock/10),10,30);
+	}
+
+	// Check for collisions
+	function collision(){
+	collision_singleVSarray(g_fuzzle,g_obstacle);
 	}
 
 	/*
@@ -123,7 +135,19 @@
 
 	function mouseDown()
 	{
-		g_mouseDown = true;
+		if (g_gameState == "mainmenu")
+		{
+			g_levelDirector = new LevelDirector();
+			g_levelDirector.startLevel();
+		}
+		else if (g_gameState == "inlevel")
+		{
+			g_mouseDown = true;
+		}
+		//else if (g_gameState == "gameover")
+		//{
+		//	g_audioLoop.play();
+		//}
 	}
 	
 	function mouseUp()
@@ -230,23 +254,24 @@
 	
 	// Resets the interval for the next obstacle creation. This is so that obstacles appear randomly
 	clearInterval(g_createObstacleInterval); 
-	var x = Math.round(Math.random() * 1000) + 2500 - (gametimer * 50); 
+	var x = Math.round(Math.random() * 1000) + 2000 - ((g_levelDirector.myCurrentLevel) * 800); 
 	g_createObstacleInterval = setInterval(createObstacle, x);
-	if (gametimer < 100)
-		{
-			gametimer++;
-		}
 	}  
 	
 	/**
 	* Stops the game
 	*/
 	function stop(){
-		clearInterval(g_frameInterval);
+		g_gameState = "gameover";
+
+		clearInterval(g_inputInterval);
+		clearInterval(g_renderInterval);
+		clearInterval(g_powerupInterval);
+		clearInterval(g_clockInterval);
 		clearInterval(g_createObstacleInterval);
+		clearInterval(g_checkCollisionInterval);
 		g_background = new Background("gameover",0);
 		g_background.render();
-		g_foreground.render();
 	}
 	</script>
   
@@ -265,6 +290,9 @@
             
     <img    id="fuzzle"
             src="Images/freshfuzzle2.png">
+
+    <img    id="powerup"
+            src="Images/heart.png">
             
     <img    id="trail"
             src="Images/Fart.png">
@@ -277,13 +305,16 @@
             
     <img    id="pillar"
             src="Images/pillar.png">
-            
+
+    <img    id="gamestart"
+            src="Images/gamestart.png">            
+
     <img    id="gameover"
             src="Images/gameover.png">
             
     <audio  id="nyan_cat" 
             src="Audio/Fresh_Prince_of_Bel_air.ogg"
-            autoplay="autoplay">
+            autobuffer='true'>
     </audio>
             
 	 </div>

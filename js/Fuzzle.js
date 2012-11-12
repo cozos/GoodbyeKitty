@@ -9,7 +9,8 @@ function fuzzle(){
 	this.height = this.ImageFile.height * g_resize;
 	
 	//Fuzzle attributes
-	this.lives = 9;
+	this.lives = 0;
+	this.powerUp = 0;
 	this.velocity = 0;
 	this.gravity = 1;
 	this.posx = 0.15 * g_canvas.width;
@@ -67,7 +68,6 @@ fuzzle.prototype.render = function(){
  */
 fuzzle.prototype.collided = function(){
 	// TODO.
-	alert("You died. But its okay. For now.");
     g_keys = [];
     g_mousedown = false;
 }

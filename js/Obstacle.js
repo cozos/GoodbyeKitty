@@ -31,7 +31,7 @@ function obstacle(element,velocity){
 obstacle.prototype.render = function(){
 
 	//Speed of obstacles will increase when the level increases
-	var scrollRate = Math.pow(1.25,level)
+	var scrollRate = Math.pow(1.25,(g_levelDirector.myCurrentLevel))
 	
 	// IF OBSTACLE IS OF TYPE DEVIL
 	if (this.type == "devil"){
@@ -77,12 +77,20 @@ obstacle.prototype.render = function(){
   	g_context.drawImage(this.ImageFile, this.posx, this.posy, this.width, this.height);
 }
 
+
+
 /**
  * What happens when an obstacle collides into something. For now, the obstacle dissapears.
  */
 obstacle.prototype.collided = function(){
 	// TODO
 	this.posx = -100;
+	g_fuzzle.lives -= 1;
+	if (g_fuzzle.lives < 0)
+	{
+		g_audioLoop.pause();
+		stop();
+	}
 }
 
 
