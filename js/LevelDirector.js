@@ -8,7 +8,6 @@ function LevelDirector()
 {
    this.myCurrentLevel = 1;
    this.myCurrentWave = 0;
-   this.mySorties = null;
    this.myClock = 0;
    this.myGameOverClock = 0;
 
@@ -29,10 +28,6 @@ LevelDirector.prototype.startLevel = function()
       g_audioLoop.play();
    }
 
-   g_background.render();
-   g_foreground.render();
-   g_fuzzle.render();
-
    g_inputInterval = setInterval(inputLoop, 1000/24);
    g_renderInterval = setInterval(renderLoop, 1000/24);
    g_clockInterval = setInterval(clockLoop, 100);
@@ -42,13 +37,20 @@ LevelDirector.prototype.startLevel = function()
 
 function clockLoop()
 {
+	var tempLevel = 1;
+	var transition = 100;
+
 	g_levelDirector.myClock += 1;
-	if (g_levelDirector.myClock == 10)
+
+	if (g_levelDirector.myCurrentLevel < 3)
 	{
-		g_angelAllianceFlag = 1;
-	}
-	if (g_levelDirector.myClock == 20)
-	{
-		g_angelAllianceFlag = 0;
+	tempLevel = g_levelDirector.myCurrentLevel;
+		g_levelDirector.myCurrentLevel = (g_levelDirector.myClock - (g_levelDirector.myClock % transition)) / transition;
+
+	if (tempLevel != g_levelDirector.myCurrentLevel)
+		{
+			g_powerupFlag = 1;
+			g_powerup = new Powerup("powerup",8);
+		}
 	}
 }

@@ -1,4 +1,18 @@
 /*
+ * Stores keys pressed into an object array(g_keys[]) and remove them from the array when the keys are released
+ */
+function keyDown(e)
+{
+	g_keys[e.keyCode] = true;
+	//e.preventDefault();
+}
+
+function keyUp(e)
+{
+	delete g_keys[e.keyCode];
+	//e.preventDefault();
+}
+/*
  * Handles keyboard input.
  */
 function keyboard()
@@ -9,8 +23,9 @@ function keyboard()
 		g_fuzzle.up();
 		
 	}
-	if (g_keys[40] == true) //check if down arrow is pressed
+	if (g_keys[16] == true) //check if down arrow is pressed
 	{
-
+		g_angelAllianceFlag = 1;
 	}
+	else {g_angelAllianceFlag = 0;}
 }

@@ -2,13 +2,23 @@
 <!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
 
 <head>
-    <script type="text/javascript" src="http://cdn.craftycomponents.com/crafty-release.js"></script>
+	<style type="text/css">
+	<!--
+	body{
+	margin: 0;
+	padding: 0;
+	}
+	--></style>
   	<script type="text/javascript" src='js/Background.js'></script>
   	<script type="text/javascript" src='js/Fuzzle.js'></script>
   	<script type="text/javascript" src='js/Keyboard.js'></script>
-  	<script type="text/javascript" src='js/Trail.js'></script>
+  	<script type="text/javascript" src='js/Mouse.js'></script>
+  	<script type="text/javascript" src='js/trail.js'></script>
+  	<script type="text/javascript" src='js/Button.js'></script>
+  	<script type="text/javascript" src='js/LevelDirector.js'></script>
   	<script type="text/javascript" src='js/Obstacle.js'></script>
-	<script type="text/javascript" src='js/LevelDirector.js'></script>
+  	<script type="text/javascript" src='js/Powerup.js'></script>
+	<script type="text/javascript" src='js/AngelAlliance.js'></script>
 	<script type="text/javascript">
 
 	//Window variables
@@ -16,17 +26,30 @@
 	var windowHeight;
 	var tempWidthRatio;
 	var tempHeghtRatio;
-	var g_resize = 0.9;
+	var g_resize = 1;
 
 	//Shit I don't understand
 	var g_canvas;
 	var g_foreground;
 	var g_background;
 	var g_context;
+	var g_button;
 
 	//Fuzzle
 	var g_fuzzle;
-	
+
+	//Powerups
+	var g_powerup;
+	var g_powerupFlag;
+	var g_angelAlliance;
+	var g_angelAllianceFlag;
+
+	//Collision flags
+	var g_fuzzleCollisionFlag = false;
+	var g_obstacleCollisionFlag = false;
+	var g_powerupCollisionFlag = false;
+	var g_angelAllianceCollisionFlag = false;
+
 	//Intervals
 	var g_renderInterval;
 	var g_clockInterval;
@@ -43,6 +66,9 @@
 	//Keys arrays
 	var g_keys = [];
 	var g_mouseDown = false;
+	var g_mouseX = [];
+	var g_mouseY = [];
+	var len = 0;
 
 	//Background Level Manager (level increases when timer is a multiple of transition, function will be called in Repaint)
 	var g_levelDirector;
@@ -57,16 +83,17 @@
 	function main(){
 		//Initializes main screen, key controls. Game start event is handled by mousedown event
 		initCanvas();
-		g_background = new Background("gamestart",0);
-		g_background.render();
+		g_renderInterval = setInterval(rendermainmenu,1000/24);
 		document.addEventListener('keydown', keyDown, false);
 		document.addEventListener('keyup', keyUp, false);
 		document.addEventListener('mousedown', mouseDown, false);
 		document.addEventListener('mouseup', mouseUp, false);
+		document.addEventListener('mousemove', mouseXY, false);
 		g_audioLoop = document.getElementById("nyan_cat");
 		g_audioLoop.volume = 0;
+
 	}
-	
+
 	/**
  	* Initializes the canvas.
  	*/
@@ -83,7 +110,7 @@
 	g_canvas.width *= g_resize;
 	g_canvas.height *= g_resize;
 	}
-	
+
 	function renderLoop()
 	{ 
 	//if ( g_paused )
@@ -96,6 +123,17 @@
 	// introduce enemy
 	renderArray(g_obstacle);
 	renderHUD();
+
+	if (g_angelAllianceFlag == 1)
+		{
+			g_angelAlliance = new Alliance("powerup", 0, 9);
+			g_angelAlliance.render();
+		}
+	if (g_powerupFlag == 1)
+		{
+			g_powerup.render();
+		}
+
 	}
 
 	function inputLoop()
@@ -103,6 +141,24 @@
 		// Makes fuzzle jump up whenever a key is pressed
 		mouse();
 		keyboard();
+
+		if (g_fuzzle.lives < 0)
+		{
+			g_audioLoop.pause();
+			stop();
+		}
+	}
+
+	function rendermainmenu()
+	{
+		g_background = new Background("gamemainmenu",0);
+		g_background.render();
+		g_button = new Button("gameplayup");
+		g_button.render();
+		g_button = new Button("gamestatsup");
+		g_button.render();
+		g_button = new Button("gameinstructup");
+		g_button.render();
 	}
 
 	function renderHUD()
@@ -113,62 +169,46 @@
             g_context.fillText("Time Elapsed: " + (g_levelDirector.myClock/10),10,30);
 	}
 
+
 	// Check for collisions
 	function collision(){
-	collision_singleVSarray(g_fuzzle,g_obstacle);
+	if (collision_singleVSarray(g_fuzzle,g_obstacle,1))
+	{
+		g_fuzzle.lives -= 1;
+	}
+	if (g_powerupFlag == 1)
+		{
+			if(collision_singleVSsingle(g_fuzzle,g_powerup,1))
+			{
+				g_fuzzle.lives += 1;
+			}
+		}
+	if (g_angelAllianceFlag == 1)
+		{
+			if(collision_singleVSarray(g_angelAlliance,g_obstacle,0))
+			{
+				g_obstacle.posx -= 100;
+				g_angelAlliance.posx -= 100;
+			}
+		}
 	}
 
 	/*
-	 * Stores keys pressed into an object array(g_keys[]) and remove them from the array when the keys are released
+	 * Checks if a singular object collides with a singular object
 	 */
-	function keyDown(e)
-	{
-		g_keys[e.keyCode] = true;
-		//e.preventDefault();
-	}
-	
-	function keyUp(e)
-	{
-		delete g_keys[e.keyCode];
-		//e.preventDefault();
-	}
-
-	function mouseDown()
-	{
-		if (g_gameState == "mainmenu")
-		{
-			g_levelDirector = new LevelDirector();
-			g_levelDirector.startLevel();
-		}
-		else if (g_gameState == "inlevel")
-		{
-			g_mouseDown = true;
-		}
-		//else if (g_gameState == "gameover")
-		//{
-		//	g_audioLoop.play();
-		//}
-	}
-	
-	function mouseUp()
-	{
-		g_mouseDown = false;
-	}
-
-	function mouse()
-	{
-		if (g_mouseDown == true) //check if mouse is pressed
-		{
-			g_fuzzle.up();	
-		}
+	function collision_singleVSsingle(single1, single2, flag){
+		if(checkCollision(single1, single2, flag))
+		return true;
 	}
 	
 	/*
 	 * Checks if a singular object collides with an array of objects 
 	 */
-	function collision_singleVSarray(single, array){
+	function collision_singleVSarray(single, array, flag){
 		for(var i = 0; i < array.length; i++){
-			checkCollision(single,array[i],1);
+			if (checkCollision(single, array[i], flag))
+			return true;
+			else {return false};
 		}
 	}
 	
@@ -188,10 +228,10 @@
     *       The second object to be checked for collision.
     * 
     * @param int $fuzzle
-    *       Set as 1 if you are checking if Fuzzle collides into something. This is because Fuzzle's hitbox is kind of fucked up, so it has to be adjusted a little.
+    *       Flag sets tells us which hitbox to reconfigure if Fuzzle collides into something. 0 specify that both object1 and object2 are not fuzzle, 1 for object1, 2 for object2. This is because Fuzzle's hitbox is kind of fucked up, so it has to be adjusted a little.
  	*/
  	
- 	function checkCollision(object1, object2,fuzzle){
+ 	function checkCollision(object1, object2,flag){
  		// Defines hitbox parameters
  		var lower_x_1 = object1.posx;
  		var upper_x_1 = object1.posx + object1.width;
@@ -206,19 +246,25 @@
  		var upper_y_2 = object2.posy + object2.height;
  		
  		// Adjusts hitbox for fuzzle
- 		if (fuzzle == 1){
+ 		if (flag == 1){
  			lower_x_1 += 60;
  			upper_x_1 += -60;
  			lower_y_1 += 50;
  			upper_y_1 += -40;
- 		}
+ 		} else if (flag == 2){
+ 			lower_x_2 += 60;
+ 			upper_x_2 += -60;
+ 			lower_y_2 += 50;
+ 			upper_y_2 += -40;
+		}
  		
  		// If the objects intersect, call collide.
  		if ( (((lower_x_1 > lower_x_2) && (lower_x_1 < upper_x_2)) || ((upper_x_1 > lower_x_2) && (upper_x_1 < upper_x_2))) &&
  			 (((lower_y_1 > lower_y_2) && (lower_y_1 < upper_y_2)) || ((upper_y_1 > lower_y_2) && (upper_y_1 < upper_y_2)))){
  			object1.collided();
  			object2.collided();
- 		}
+			return true;
+		}
  	}
 	
 	/**
@@ -227,7 +273,7 @@
 	function renderArray(array){
 		for (var j=0; j<array.length; j++){
 			// If the object past the left of the screen, it is deleted.
-			if(array[j].posx < -50){
+			if(array[j].posx < -200){
 			array.splice(j,1);
 			}
 			
@@ -270,8 +316,16 @@
 		clearInterval(g_clockInterval);
 		clearInterval(g_createObstacleInterval);
 		clearInterval(g_checkCollisionInterval);
+		g_context.clearRect(0,0,g_canvas.width,g_canvas.height);
 		g_background = new Background("gameover",0);
 		g_background.render();
+		g_button = new Button("gamereplayup");
+		g_button.render();
+		g_button = new Button("gamestatsup");
+		g_button.render();
+		g_button = new Button("gameinstructup");
+		g_button.render();
+
 	}
 	</script>
   
@@ -306,8 +360,32 @@
     <img    id="pillar"
             src="Images/pillar.png">
 
-    <img    id="gamestart"
-            src="Images/gamestart.png">            
+    <img    id="gamemainmenu"
+            src="Images/gamemainmenu.png">
+
+    <img    id="gamereplayup"
+            src="Images/gamereplayup.png">         
+
+    <img    id="gamereplaydown"
+            src="Images/gamereplaydown.png">         
+
+    <img    id="gameplayup"
+            src="Images/gameplayup.png">         
+
+    <img    id="gameplaydown"
+            src="Images/gameplaydown.png">         
+
+    <img    id="gameinstructup"
+            src="Images/gameinstructup.png">
+
+    <img    id="gameinstructdown"
+            src="Images/gameinstructdown.png">
+
+    <img    id="gamestatsup"
+            src="Images/gamestatsup.png">
+
+    <img    id="gamestatsdown"
+            src="Images/gamestatsdown.png">
 
     <img    id="gameover"
             src="Images/gameover.png">
