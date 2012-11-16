@@ -1,3 +1,0 @@
-sky: 0 to 640
-cloud: 640 to 795
-kitty: x(0 to 95) y(795 to 915)
