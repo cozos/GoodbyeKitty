@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+
+<head>
+	<style type="text/css">
+	<!--
+	body{
+	margin: 0;
+	padding: 0;
+	}
+	--></style>
+  	<script type="text/javascript" src='js/Background.js'></script>
+  	<script type="text/javascript" src='js/Fuzzle.js'></script>
+  	<script type="text/javascript" src='js/Keyboard.js'></script>
+  	<script type="text/javascript" src='js/Mouse.js'></script>
+  	<script type="text/javascript" src='js/trail.js'></script>
+  	<script type="text/javascript" src='js/Button.js'></script>
+  	<script type="text/javascript" src='js/LevelDirector.js'></script>
+  	<script type="text/javascript" src='js/Obstacle.js'></script>
+  	<script type="text/javascript" src='js/Powerup.js'></script>
+	<script type="text/javascript" src='js/AngelAlliance.js'></script>
+	<script type="text/javascript">
+
+	//Window variables
+	var windowWidth;
+	var windowHeight;
+	var tempWidthRatio;
+	var tempHeghtRatio;
+	var g_resize = 1;
+
+	//Shit I don't understand
+	var g_canvas;
+	var g_foreground;
+	var g_background;
+	var g_context;
+	var g_button;
+
+	//Fuzzle
+	var g_fuzzle;
+
+	//Powerups
+	var g_powerup;
+	var g_powerupFlag;
+	var g_angelAlliance;
+	var g_angelAllianceFlag;
+
+	//Collision flags
+	var g_fuzzleCollisionFlag = false;
+	var g_obstacleCollisionFlag = false;
+	var g_powerupCollisionFlag = false;
+	var g_angelAllianceCollisionFlag = false;
+
+	//Intervals
+	var g_renderInterval;
+	var g_clockInterval;
+	var g_inputInterval;
+	var g_createObstacleInterval;
+	var g_powerupInterval;
+	var g_checkCollisionInterval;
+	var gametimer;
+	
+	//Object arrays
+	var g_trail = [];
+	var g_obstacle = [];
+
+	//Keys arrays
+	var g_keys = [];
+	var g_mouseDown = false;
+	var g_mouseX = [];
+	var g_mouseY = [];
+	var len = 0;
+
+	//Background Level Manager (level increases when timer is a multiple of transition, function will be called in Repaint)
+	var g_levelDirector;
+	var g_gameState = "mainmenu";
+
+	//Audio manager
+	var g_audioLoop;
+	
+	/**
+ 	* It's the main.
+ 	*/
+	function main(){
+		//Initializes main screen, key controls. Game start event is handled by mousedown event
+		initCanvas();
+		g_renderInterval = setInterval(rendermainmenu,1000/24);
+		document.addEventListener('keydown', keyDown, false);
+		document.addEventListener('keyup', keyUp, false);
+		document.addEventListener('mousedown', mouseDown, false);
+		document.addEventListener('mouseup', mouseUp, false);
+		document.addEventListener('mousemove', mouseXY, false);
+		g_audioLoop = document.getElementById("nyan_cat");
+		g_audioLoop.volume = 0;
+
+	}
+
+	/**
+ 	* Initializes the canvas.
+ 	*/
+	function initCanvas(){
+	g_canvas = document.getElementById('theCanvas');
+	g_context = g_canvas.getContext('2d');
+	
+	//Gets the innerWidth and innerHeight of browser and stores the minimum ratio to g_resize, subsequently resizing g_canvas
+	windowWidth = window.innerWidth;
+	windowHeight = window.innerHeight;
+	tempWidthRatio = windowWidth / g_canvas.width;
+	tempHeightRatio = windowHeight / g_canvas.height;
+	g_resize = Math.min(tempWidthRatio,tempHeightRatio);
+	g_canvas.width *= g_resize;
+	g_canvas.height *= g_resize;
+	}
+
+	function renderLoop()
+	{ 
+	//if ( g_paused )
+	//return;
+
+	g_background.render();
+	g_foreground.render();
+	g_fuzzle.render();
+	renderArray(g_trail);
+	// introduce enemy
+	renderArray(g_obstacle);
+	renderHUD();
+
+	if (g_angelAllianceFlag == 1)
+		{
+			g_angelAlliance = new Alliance("powerup", 0, 9);
+			g_angelAlliance.render();
+		}
+	if (g_powerupFlag == 1)
+		{
+			g_powerup.render();
+		}
+
+	}
+
+	function inputLoop()
+	{
+		// Makes fuzzle jump up whenever a key is pressed
+		mouse();
+		keyboard();
+
+		if (g_fuzzle.lives < 0)
+		{
+			g_audioLoop.pause();
+			stop();
+		}
+	}
+
+	function rendermainmenu()
+	{
+		g_background = new Background("gamemainmenu",0);
+		g_background.render();
+		g_button = new Button("gameplayup");
+		g_button.render();
+		g_button = new Button("gamestatsup");
+		g_button.render();
+		g_button = new Button("gameinstructup");
+		g_button.render();
+	}
+
+	function renderHUD()
+	{
+            g_context.fillStyle = "black";
+            g_context.fillText("Lives: " + g_fuzzle.lives,10,10);
+            g_context.fillText("Powerups: " + g_fuzzle.powerUp + "/9",10,20);
+            g_context.fillText("Time Elapsed: " + (g_levelDirector.myClock/10),10,30);
+	}
+
+
+	// Check for collisions
+	function collision(){
+	if (collision_singleVSarray(g_fuzzle,g_obstacle,1))
+	{
+		g_fuzzle.lives -= 1;
+	}
+	if (g_powerupFlag == 1)
+		{
+			if(collision_singleVSsingle(g_fuzzle,g_powerup,1))
+			{
+				g_fuzzle.lives += 1;
+			}
+		}
+	if (g_angelAllianceFlag == 1)
+		{
+			if(collision_singleVSarray(g_angelAlliance,g_obstacle,0))
+			{
+				g_obstacle.posx -= 100;
+				g_angelAlliance.posx -= 100;
+			}
+		}
+	}
+
+	/*
+	 * Checks if a singular object collides with a singular object
+	 */
+	function collision_singleVSsingle(single1, single2, flag){
+		if(checkCollision(single1, single2, flag))
+		return true;
+	}
+	
+	/*
+	 * Checks if a singular object collides with an array of objects 
+	 */
+	function collision_singleVSarray(single, array, flag){
+		for(var i = 0; i < array.length; i++){
+			if (checkCollision(single, array[i], flag))
+			return true;
+			else {return false};
+		}
+	}
+	
+	/*
+	 * Checks if an array of objects with another array of objects 
+	 */
+	function collision_arrayVSarray(array, array){
+		// TODO
+	}
+	
+	/**
+ 	* Checks for collision between two objects.
+    * @param Fuzzle|Obstacle|Trail $object1
+    *       The first object to be checked for collision.
+    * 
+    * @param Fuzzle|Obstacle|Trail $object2
+    *       The second object to be checked for collision.
+    * 
+    * @param int $fuzzle
+    *       Flag sets tells us which hitbox to reconfigure if Fuzzle collides into something. 0 specify that both object1 and object2 are not fuzzle, 1 for object1, 2 for object2. This is because Fuzzle's hitbox is kind of fucked up, so it has to be adjusted a little.
+ 	*/
+ 	
+ 	function checkCollision(object1, object2,flag){
+ 		// Defines hitbox parameters
+ 		var lower_x_1 = object1.posx;
+ 		var upper_x_1 = object1.posx + object1.width;
+ 		
+ 		var lower_y_1 = object1.posy;
+ 		var upper_y_1 = object1.posy + object1.height;
+ 		
+ 		var lower_x_2 = object2.posx;
+ 		var upper_x_2 = object2.posx + object2.width;
+ 		
+ 		var lower_y_2 = object2.posy;
+ 		var upper_y_2 = object2.posy + object2.height;
+ 		
+ 		// Adjusts hitbox for fuzzle
+ 		if (flag == 1){
+ 			lower_x_1 += 60;
+ 			upper_x_1 += -60;
+ 			lower_y_1 += 50;
+ 			upper_y_1 += -40;
+ 		} else if (flag == 2){
+ 			lower_x_2 += 60;
+ 			upper_x_2 += -60;
+ 			lower_y_2 += 50;
+ 			upper_y_2 += -40;
+		}
+ 		
+ 		// If the objects intersect, call collide.
+ 		if ( (((lower_x_1 > lower_x_2) && (lower_x_1 < upper_x_2)) || ((upper_x_1 > lower_x_2) && (upper_x_1 < upper_x_2))) &&
+ 			 (((lower_y_1 > lower_y_2) && (lower_y_1 < upper_y_2)) || ((upper_y_1 > lower_y_2) && (upper_y_1 < upper_y_2)))){
+ 			object1.collided();
+ 			object2.collided();
+			return true;
+		}
+ 	}
+	
+	/**
+ 	* Iterates through the object array and renders each one.
+ 	*/
+	function renderArray(array){
+		for (var j=0; j<array.length; j++){
+			// If the object past the left of the screen, it is deleted.
+			if(array[j].posx < -200){
+			array.splice(j,1);
+			}
+			
+			// Renders the object
+			array[j].render();
+		}
+	}
+	
+	/**
+ 	* Creates an obstacle. Called by g_createObstacleInterval.
+ 	*/
+	function createObstacle() 
+	{
+	var d;
+	
+	/**
+ 	* Determines randomly (if 0 then devil, if 1,2 then pillar) which obstacle to instantiate.
+ 	*/
+	if (Math.round(Math.random()*1.5) == 0) d = new obstacle("devil",-7);
+	else d = new obstacle("pillar",-5);
+	
+	// Instantiates new Obstacle
+	g_obstacle.push(d);
+	
+	// Resets the interval for the next obstacle creation. This is so that obstacles appear randomly
+	clearInterval(g_createObstacleInterval); 
+	var x = Math.round(Math.random() * 1000) + 2000 - ((g_levelDirector.myCurrentLevel) * 800); 
+	g_createObstacleInterval = setInterval(createObstacle, x);
+	}  
+	
+	/**
+	* Stops the game
+	*/
+	function stop(){
+		g_gameState = "gameover";
+
+		clearInterval(g_inputInterval);
+		clearInterval(g_renderInterval);
+		clearInterval(g_powerupInterval);
+		clearInterval(g_clockInterval);
+		clearInterval(g_createObstacleInterval);
+		clearInterval(g_checkCollisionInterval);
+		g_context.clearRect(0,0,g_canvas.width,g_canvas.height);
+		g_background = new Background("gameover",0);
+		g_background.render();
+		g_button = new Button("gamereplayup");
+		g_button.render();
+		g_button = new Button("gamestatsup");
+		g_button.render();
+		g_button = new Button("gameinstructup");
+		g_button.render();
+
+	}
+	</script>
+  
+</head>
+
+<body onload = "main()">
+	
+	 <canvas align="left" id="theCanvas" width="960" height="640">empty</canvas>
+	 <div id="hidden" style="visibility:hidden; width:1px; height:1px; overflow:hidden">
+	
+    <img    id="cloud"
+            src="Images/cloud overlay.png">	
+	
+    <img    id="sky"
+            src="Images/sky.png">
+            
+    <img    id="fuzzle"
+            src="Images/freshfuzzle2.png">
+
+    <img    id="powerup"
+            src="Images/heart.png">
+            
+    <img    id="trail"
+            src="Images/Fart.png">
+            
+    <img    id="firetrail"
+            src="Images/FieryFart.png">
+        
+    <img    id="devil"
+            src="Images/devil.png">
+            
+    <img    id="pillar"
+            src="Images/pillar.png">
+
+    <img    id="gamemainmenu"
+            src="Images/gamemainmenu.png">
+
+    <img    id="gamereplayup"
+            src="Images/gamereplayup.png">         
+
+    <img    id="gamereplaydown"
+            src="Images/gamereplaydown.png">         
+
+    <img    id="gameplayup"
+            src="Images/gameplayup.png">         
+
+    <img    id="gameplaydown"
+            src="Images/gameplaydown.png">         
+
+    <img    id="gameinstructup"
+            src="Images/gameinstructup.png">
+
+    <img    id="gameinstructdown"
+            src="Images/gameinstructdown.png">
+
+    <img    id="gamestatsup"
+            src="Images/gamestatsup.png">
+
+    <img    id="gamestatsdown"
+            src="Images/gamestatsdown.png">
+
+    <img    id="gameover"
+            src="Images/gameover.png">
+            
+    <audio  id="nyan_cat" 
+            src="Audio/Fresh_Prince_of_Bel_air.ogg"
+            autobuffer='true'>
+    </audio>
+            
+	 </div>
+</body>
+</html>
